@@ -36,16 +36,8 @@ $(document).ready(function () {
                 showProduct();
             }
 
-            // 로그인한 유저의 폴더
-            $.ajax({
-                type: 'GET',
-                url: `/api/user-folder`,
-                error(error) {
-                    logout();
-                }
-            }).done(function (fragment) {
-                $('#fragment').replaceWith(fragment);
-            });
+            // 로그인한 유저의 폴더 로드
+            loadFolders();
 
         })
         .fail(function (jqXHR, textStatus) {
@@ -82,6 +74,31 @@ $(document).ready(function () {
     $('#see-area').show();
     $('#search-area').hide();
 })
+
+// 폴더 목록 로드 함수
+function loadFolders() {
+    $.ajax({
+        type: 'GET',
+        url: `/api/folders`,
+        error(error) {
+            logout();
+        }
+    }).done(function (folders) {
+        let folderHTML = '';
+        folders.forEach(function(folder) {
+            folderHTML += `
+                <div>
+                    <button class="folder-bar-item folder-button product-folder"
+                            value="${folder.id}"
+                            onclick="openFolder(${folder.id})">
+                        ${folder.name}
+                    </button>
+                </div>
+            `;
+        });
+        $('#folder-list').html(folderHTML);
+    });
+}
 
 function numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -292,7 +309,12 @@ function addFolder() {
         }
         $('#container2').removeClass('active');
         alert('성공적으로 등록되었습니다.');
-        window.location.reload();
+
+        // 폴더 목록만 다시 로드 (페이지 새로고침 대신)
+        loadFolders();
+
+        // 입력 필드 초기화
+        $('.folderToAdd').val('');
     })
         .fail(function(xhr, textStatus, errorThrown) {
             alert("중복된 폴더입니다.");

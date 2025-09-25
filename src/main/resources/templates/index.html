@@ -43,7 +43,7 @@
         <div>
             <button id="folder-all" class="folder-bar-item folder-button product-folder folder-active" onclick="openFolder()">전체</button>
         </div>
-        <div id="fragment">
+        <div id="folder-list">
             <div th:each="folder : ${folders}">
                 <button class="folder-bar-item folder-button product-folder"
                         th:value="${folder.id}"
